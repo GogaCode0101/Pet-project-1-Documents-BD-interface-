@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Добро пожаловать в систему управления базой данных</h1>
+            <p class="lead mb-4">Выберите нужный раздел в меню навигации:</p>
+            
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Документы</h5>
+                            <p class="card-text">Просмотр и управление документами</p>
+                            <a href="/documents" class="btn btn-primary">Перейти</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Справочник</h5>
+                            <p class="card-text">Справочные данные и классификаторы</p>
+                            <a href="/reference" class="btn btn-primary">Перейти</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Запросы</h5>
+                            <p class="card-text">Выполнение предопределенных запросов</p>
+                            <a href="/queries" class="btn btn-primary">Перейти</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

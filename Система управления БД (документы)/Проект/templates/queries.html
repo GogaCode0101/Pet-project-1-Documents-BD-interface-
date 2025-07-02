@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Запросы{% endblock %}
+
+{% block content %}
+<h1>Запросы</h1>
+
+<div class="accordion" id="queriesAccordion">
+    <!-- Аналитические запросы -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnalytics">
+                Аналитические запросы
+            </button>
+        </h2>
+        <div id="collapseAnalytics" class="accordion-collapse collapse show" data-bs-parent="#queriesAccordion">
+            <div class="accordion-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Анализ качества работ по подрядчикам</h5>
+                                <p class="card-text">Статистика по качеству выполненных работ для каждого подрядчика</p>
+                                <button class="btn btn-primary" onclick="executeQuery('quality_analysis')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Статистика по договорам подряда</h5>
+                                <p class="card-text">Общая статистика по договорам подряда</p>
+                                <button class="btn btn-primary" onclick="executeQuery('contract_stats')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Статистика по качеству работ</h5>
+                                <p class="card-text">Анализ качества работ и связанных сумм</p>
+                                <button class="btn btn-primary" onclick="executeQuery('work_quality_stats')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Анализ дополнительных соглашений</h5>
+                                <p class="card-text">Статистика по дополнительным соглашениям к договорам</p>
+                                <button class="btn btn-primary" onclick="executeQuery('agreement_analysis')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Мониторинг и контроль -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMonitoring">
+                Мониторинг и контроль
+            </button>
+        </h2>
+        <div id="collapseMonitoring" class="accordion-collapse collapse" data-bs-parent="#queriesAccordion">
+            <div class="accordion-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Акты с просроченным гарантийным сроком</h5>
+                                <p class="card-text">Поиск актов с истекшим гарантийным сроком</p>
+                                <button class="btn btn-primary" onclick="executeQuery('expired_warranty')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Договоры с наибольшим количеством изменений</h5>
+                                <p class="card-text">Поиск договоров с наибольшим процентом изменений</p>
+                                <button class="btn btn-primary" onclick="executeQuery('most_changed_contracts')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Анализ просроченных платежей</h5>
+                                <p class="card-text">Поиск договоров с просроченными платежами</p>
+                                <button class="btn btn-primary" onclick="executeQuery('overdue_payments')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Анализ клиентов -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseClients">
+                Анализ клиентов
+            </button>
+        </h2>
+        <div id="collapseClients" class="accordion-collapse collapse" data-bs-parent="#queriesAccordion">
+            <div class="accordion-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Наиболее активные заказчики</h5>
+                                <p class="card-text">Статистика по заказчикам и их договорам</p>
+                                <button class="btn btn-primary" onclick="executeQuery('active_clients')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Анализ заказчиков по количеству договоров</h5>
+                                <p class="card-text">Распределение заказчиков по количеству заключенных договоров</p>
+                                <button class="btn btn-primary" onclick="executeQuery('client_contract_count')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Динамика работы с заказчиками</h5>
+                                <p class="card-text">Анализ активности заказчиков по месяцам</p>
+                                <button class="btn btn-primary" onclick="executeQuery('client_activity_dynamics')">Выполнить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for displaying query results -->
+<div class="modal fade" id="queryModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Результаты запроса</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const queries = {
+    quality_analysis: `SELECT 
+        л.фио as подрядчик,
+        COUNT(ас.id) as количество_актов,
+        COUNT(CASE WHEN ас.качество_работ = 'Отличное' THEN 1 END) as отличное_качество,
+        COUNT(CASE WHEN ас.качество_работ = 'Хорошее' THEN 1 END) as хорошее_качество,
+        COUNT(CASE WHEN ас.качество_работ = 'Удовлетворительное' THEN 1 END) as удовлетворительное_качество
+    FROM акты_сдачи_приемки_работ ас
+    JOIN договоры_подряда дп ON ас.договор_id = дп.id
+    JOIN стороны_договора_подряда сдп ON дп.id = сдп.договор_id
+    JOIN лица л ON сдп.лицо_id = л.id
+    WHERE сдп.роль = 'Подрядчик'
+    GROUP BY л.фио
+    ORDER BY количество_актов DESC`,
+
+    contract_stats: `SELECT 
+        COUNT(*) as количество_договоров,
+        SUM(сумма_договора) as общая_сумма,
+        AVG(сумма_договора) as средняя_сумма,
+        MIN(дата_заключения) as первый_договор,
+        MAX(дата_заключения) as последний_договор
+    FROM договоры_подряда`,
+
+    expired_warranty: `SELECT 
+        ас.id,
+        ас.дата_составления,
+        ас.срок_гарантии,
+        дп.номер_договора,
+        л.фио as подрядчик
+    FROM акты_сдачи_приемки_работ ас
+    JOIN договоры_подряда дп ON ас.договор_id = дп.id
+    JOIN стороны_договора_подряда сдп ON дп.id = сдп.договор_id
+    JOIN лица л ON сдп.лицо_id = л.id
+    WHERE сдп.роль = 'Подрядчик'
+        AND (ас.дата_составления + ас.срок_гарантии * INTERVAL '1 day') < CURRENT_DATE`,
+
+    work_quality_stats: `SELECT 
+        качество_работ,
+        COUNT(*) as количество_актов,
+        AVG(общая_сумма) as средняя_сумма,
+        MIN(общая_сумма) as минимальная_сумма,
+        MAX(общая_сумма) as максимальная_сумма
+    FROM акты_сдачи_приемки_работ
+    GROUP BY качество_работ
+    ORDER BY количество_актов DESC`,
+
+    agreement_analysis: `SELECT 
+        дп.номер_договора,
+        COUNT(дсп.id) as количество_соглашений,
+        SUM(дсп.сумма_изменений) as общая_сумма_изменений,
+        AVG(дсп.сумма_изменений) as средняя_сумма_изменений
+    FROM договоры_подряда дп
+    LEFT JOIN дополнительные_соглашения_подряд дсп ON дп.id = дсп.договор_id
+    GROUP BY дп.id, дп.номер_договора
+    ORDER BY количество_соглашений DESC`,
+
+    most_changed_contracts: `SELECT 
+        дп.номер_договора,
+        COUNT(дсп.id) as количество_соглашений,
+        SUM(дсп.сумма_изменений) as общая_сумма_изменений,
+        (SUM(дсп.сумма_изменений) / дп.сумма_договора * 100) as процент_изменений
+    FROM договоры_подряда дп
+    LEFT JOIN дополнительные_соглашения_подряд дсп ON дп.id = дсп.договор_id
+    GROUP BY дп.id, дп.номер_договора, дп.сумма_договора
+    HAVING COUNT(дсп.id) > 0
+    ORDER BY процент_изменений DESC`,
+
+    active_clients: `SELECT 
+        л.фио as заказчик,
+        COUNT(дп.id) as количество_договоров,
+        SUM(дп.сумма_договора) as общая_сумма_договоров,
+        AVG(дп.сумма_договора) as средняя_сумма_договора
+    FROM договоры_подряда дп
+    JOIN стороны_договора_подряда сдп ON дп.id = сдп.договор_id
+    JOIN лица л ON сдп.лицо_id = л.id
+    WHERE сдп.роль = 'Заказчик'
+    GROUP BY л.фио
+    ORDER BY общая_сумма_договоров DESC`,
+
+    overdue_payments: `SELECT 
+        дп.номер_договора,
+        дп.сумма_договора,
+        дп.дата_заключения,
+        л.фио as заказчик,
+        CURRENT_DATE - дп.дата_заключения as дней_с_заключения,
+        CASE 
+            WHEN CURRENT_DATE - дп.дата_заключения > 30 THEN 'Просрочен'
+            ELSE 'Активен'
+        END as статус_договора
+    FROM договоры_подряда дп
+    JOIN стороны_договора_подряда сдп ON дп.id = сдп.договор_id
+    JOIN лица л ON сдп.лицо_id = л.id
+    WHERE сдп.роль = 'Заказчик'
+    ORDER BY дней_с_заключения DESC`,
+
+    client_contract_amounts: `SELECT 
+        CASE 
+            WHEN дп.сумма_договора <= 100000 THEN 'До 100 тыс.'
+            WHEN дп.сумма_договора <= 500000 THEN '100-500 тыс.'
+            WHEN дп.сумма_договора <= 1000000 THEN '500 тыс. - 1 млн'
+            ELSE 'Более 1 млн'
+        END as категория_суммы,
+        COUNT(DISTINCT л.id) as количество_заказчиков,
+        COUNT(дп.id) as количество_договоров,
+        SUM(дп.сумма_договора) as общая_сумма_договоров,
+        AVG(дп.сумма_договора) as средняя_сумма_договора,
+        COUNT(DISTINCT CASE WHEN дп.дата_заключения >= CURRENT_DATE - INTERVAL '1 year' THEN дп.id END) as договоры_за_год,
+        COUNT(DISTINCT CASE WHEN дп.дата_заключения >= CURRENT_DATE - INTERVAL '1 month' THEN дп.id END) as договоры_за_месяц
+    FROM договоры_подряда дп
+    JOIN стороны_договора_подряда сдп ON дп.id = сдп.договор_id
+    JOIN лица л ON сдп.лицо_id = л.id
+    WHERE сдп.роль = 'Заказчик'
+    GROUP BY 
+        CASE 
+            WHEN дп.сумма_договора <= 100000 THEN 'До 100 тыс.'
+            WHEN дп.сумма_договора <= 500000 THEN '100-500 тыс.'
+            WHEN дп.сумма_договора <= 1000000 THEN '500 тыс. - 1 млн'
+            ELSE 'Более 1 млн'
+        END
+    ORDER BY 
+        CASE 
+            WHEN дп.сумма_договора <= 100000 THEN 1
+            WHEN дп.сумма_договора <= 500000 THEN 2
+            WHEN дп.сумма_договора <= 1000000 THEN 3
+            ELSE 4
+        END`,
+
+    client_contract_count: `SELECT 
+        COUNT(*) as количество_договоров,
+        COUNT(DISTINCT л.id) as количество_заказчиков
+    FROM договоры_подряда дп
+    JOIN стороны_договора_подряда сдп ON дп.id = сдп.договор_id
+    JOIN лица л ON сдп.лицо_id = л.id
+    WHERE сдп.роль = 'Заказчик'
+    GROUP BY л.фио
+    ORDER BY количество_договоров DESC`,
+
+    client_activity_dynamics: `SELECT 
+        л.фио as заказчик,
+        DATE_TRUNC('month', дп.дата_заключения) as месяц,
+        COUNT(дп.id) as количество_договоров,
+        SUM(дп.сумма_договора) as сумма_договоров
+    FROM договоры_подряда дп
+    JOIN стороны_договора_подряда сдп ON дп.id = сдп.договор_id
+    JOIN лица л ON сдп.лицо_id = л.id
+    WHERE сдп.роль = 'Заказчик'
+    GROUP BY л.фио, DATE_TRUNC('month', дп.дата_заключения)
+    ORDER BY л.фио, месяц DESC`
+};
+
+function executeQuery(queryType) {
+    const modal = $('#queryModal');
+    modal.find('tbody').html('<tr><td colspan="100" class="text-center">Загрузка...</td></tr>');
+    modal.modal('show');
+
+    $.ajax({
+        url: '/api/execute_query',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ query: queries[queryType] }),
+        success: function(response) {
+            if (response.success) {
+                const data = response.data;
+                if (data.length > 0) {
+                    const headers = Object.keys(data[0]);
+                    const headerHtml = headers.map(h => `<th>${h}</th>`).join('');
+                    modal.find('thead').html(`<tr>${headerHtml}</tr>`);
+
+                    const rows = data.map(row => {
+                        const cells = headers.map(h => `<td>${row[h]}</td>`).join('');
+                        return `<tr>${cells}</tr>`;
+                    }).join('');
+                    modal.find('tbody').html(rows);
+                } else {
+                    modal.find('tbody').html('<tr><td colspan="100" class="text-center">Нет данных</td></tr>');
+                }
+            } else {
+                modal.find('tbody').html(`<tr><td colspan="100" class="text-center text-danger">Ошибка: ${response.error}</td></tr>`);
+            }
+        },
+        error: function(xhr, status, error) {
+            modal.find('tbody').html(`<tr><td colspan="100" class="text-center text-danger">Ошибка: ${error}</td></tr>`);
+        }
+    });
+}
+</script>
+{% endblock %} 

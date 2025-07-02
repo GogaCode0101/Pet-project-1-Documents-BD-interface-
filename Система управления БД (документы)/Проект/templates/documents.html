@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Документы{% endblock %}
+
+{% block content %}
+<h1>Документы</h1>
+<div class="accordion" id="documentsAccordion">
+    {% for category, tables in categories.items() %}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+                {{ category }}
+            </button>
+        </h2>
+        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#documentsAccordion">
+            <div class="accordion-body">
+                <div class="row">
+                    {% for table in tables %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ table.replace('_', ' ') }}</h5>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-primary view-table" data-table="{{ table }}">Просмотреть</button>
+                                    <button class="btn btn-success add-record" data-table="{{ table }}">Добавить</button>
+                                    <button class="btn btn-warning edit-record" data-table="{{ table }}">Редактировать</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal for displaying table data -->
+<div class="modal fade" id="tableModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for adding/editing records -->
+<div class="modal fade" id="recordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="recordForm">
+                    <input type="hidden" id="recordId">
+                    <div id="formFields"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="saveRecord">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    let currentTable = '';
+    let currentMode = '';
+
+    // Функция для отображения данных таблицы
+    function loadTableData(tableName) {
+        const modal = $('#tableModal');
+        modal.find('.modal-title').text(tableName.replace(/_/g, ' '));
+        modal.find('tbody').html('<tr><td colspan="100" class="text-center">Загрузка...</td></tr>');
+        modal.modal('show');
+
+        $.get(`/api/table/${tableName}`, function(response) {
+            if (response.success) {
+                const data = response.data;
+                if (data.length > 0) {
+                    const headers = Object.keys(data[0]);
+                    // Фильтруем заголовки, исключая столбцы с ID
+                    const filteredHeaders = headers.filter(h => !h.toLowerCase().includes('id') && h !== 'id');
+                    const headerHtml = filteredHeaders.map(h => `<th>${h.replace(/_/g, ' ')}</th>`).join('');
+                    modal.find('thead').html(`<tr>${headerHtml}</tr>`);
+
+                    const rows = data.map(row => {
+                        const cells = filteredHeaders.map(h => `<td>${row[h]}</td>`).join('');
+                        return `<tr>${cells}</tr>`;
+                    }).join('');
+                    modal.find('tbody').html(rows);
+                } else {
+                    modal.find('tbody').html('<tr><td colspan="100" class="text-center">Нет данных</td></tr>');
+                }
+            } else {
+                modal.find('tbody').html(`<tr><td colspan="100" class="text-center text-danger">Ошибка: ${response.error}</td></tr>`);
+            }
+        });
+    }
+
+    // Функция для загрузки структуры таблицы
+    function loadTableStructure(tableName) {
+        return $.get(`/api/table_structure/${tableName}`);
+    }
+
+    // Функция для создания формы
+    function createForm(structure, data = {}) {
+        const formFields = $('#formFields');
+        formFields.empty();
+
+        structure.forEach(field => {
+            // Пропускаем поле ID при добавлении новой записи
+            if (currentMode === 'add' && (field.name === 'id' || field.name.toLowerCase().includes('id'))) {
+                return;
+            }
+            
+            const value = data[field.name] || '';
+            const input = $(`
+                <div class="mb-3">
+                    <label class="form-label">${field.name.replace(/_/g, ' ')}</label>
+                    <input type="text" class="form-control" name="${field.name}" value="${value}">
+                </div>
+            `);
+            formFields.append(input);
+        });
+    }
+
+    // Обработчик просмотра таблицы
+    $('.view-table').click(function() {
+        currentTable = $(this).data('table');
+        loadTableData(currentTable);
+    });
+
+    // Обработчик добавления записи
+    $('.add-record').click(function() {
+        currentTable = $(this).data('table');
+        currentMode = 'add';
+        const modal = $('#recordModal');
+        modal.find('.modal-title').text(`Добавить запись в ${currentTable.replace(/_/g, ' ')}`);
+        
+        loadTableStructure(currentTable).then(response => {
+            if (response.success) {
+                createForm(response.structure);
+                modal.modal('show');
+            }
+        });
+    });
+
+    // Обработчик редактирования записи
+    $('.edit-record').click(function() {
+        currentTable = $(this).data('table');
+        currentMode = 'edit';
+        const modal = $('#recordModal');
+        modal.find('.modal-title').text(`Редактировать запись в ${currentTable.replace(/_/g, ' ')}`);
+        
+        // Сначала загружаем данные таблицы
+        $.get(`/api/table/${currentTable}`, function(response) {
+            if (response.success && response.data.length > 0) {
+                // Создаем выпадающий список для выбора записи
+                const select = $('<select class="form-select mb-3"><option value="">Выберите запись для редактирования</option></select>');
+                response.data.forEach((record, index) => {
+                    const option = $('<option></option>');
+                    option.val(index);
+                    option.text(Object.values(record).join(' - '));
+                    select.append(option);
+                });
+                
+                $('#formFields').empty().append(select);
+                
+                // При выборе записи загружаем её данные
+                select.change(function() {
+                    const selectedRecord = response.data[$(this).val()];
+                    if (selectedRecord) {
+                        loadTableStructure(currentTable).then(structureResponse => {
+                            if (structureResponse.success) {
+                                createForm(structureResponse.structure, selectedRecord);
+                            }
+                        });
+                    }
+                });
+                
+                modal.modal('show');
+            }
+        });
+    });
+
+    // Обработчик сохранения записи
+    $('#saveRecord').click(function() {
+        const formData = {};
+        $('#recordForm').serializeArray().forEach(item => {
+            formData[item.name] = item.value;
+        });
+
+        const url = currentMode === 'add' 
+            ? `/api/add_record/${currentTable}`
+            : `/api/update_record/${currentTable}`;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                if (response.success) {
+                    $('#recordModal').modal('hide');
+                    loadTableData(currentTable);
+                } else {
+                    alert('Ошибка: ' + response.error);
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 
